@@ -3,42 +3,185 @@
 <head>
 	<title>Track and Treat Testing</title>
 	<link rel="stylesheet" type="text/css" href="index.css">
+	<meta charset="utf-8">
 </head>
 <body class="whole">
+	<script type="text/javascript">
+		var streets = [];
+
+		function Street(name, safety, decorationQuality, review) {
+			this.name = name;
+			this.safetyValues = [safety];
+			this.decorationValues = [decorationQuality];
+			//this.candyTypeValues = [candyTypes];
+			this.reviews = [review];
+
+			this.updateValues = function() {
+				this.safety = this.getAverage(this.safetyValues);
+				this.decorationQuality = this.getAverage(this.decorationValues);
+				document.getElementById("safety").innerHTML = this.getAverage(this.safetyValues);
+				document.getElementById("decoration-quality").innerHTML = this.getAverage(this.decorationValues);
+			}
+
+			this.getAverage = function(array) {
+				var total = 0;
+				for (i = 0; i < array.length; i++) {
+					total += array[i];
+				}
+				return total / array.length;
+			}
+
+			this.safety = this.getAverage(this.safetyValues);
+			this.decorationQuality = this.getAverage(this.decorationValues);
+		}
+
+		function change() {
+			var streetName = "";
+			var safety = 0;
+			var decorationQuality = 0;
+			var candyTypes = [];
+			var review = "";
+
+			streetName = document.getElementById("name-location").innerHTML;
+
+			if (document.getElementById("sb5").checked) safety += 5;
+			if (document.getElementById("sb4").checked) safety += 4;
+			if (document.getElementById("sb3").checked) safety += 3;
+			if (document.getElementById("sb2").checked) safety += 2;
+			if (document.getElementById("sb1").checked) safety += 1;
+
+			if (document.getElementById("db5").checked) decorationQuality += 5;
+			if (document.getElementById("db4").checked) decorationQuality += 4;
+			if (document.getElementById("db3").checked) decorationQuality += 3;
+			if (document.getElementById("db2").checked) decorationQuality += 2;
+			if (document.getElementById("db1").checked) decorationQuality += 1;
+
+			/*var candyTypeValues = document.getElementsByName("candy");
+			for (i = 0; i < candyTypeValues.length; i++) {
+				if (candyTypeValues[i].checked) {
+					candyTypes.push(document.getElementsByClassName("candy-label")[i].innerText);
+				}
+			}*/
+
+			review = document.getElementById("review").value;
+
+			var streetIndex = -1;
+			for (i = 0; i < streets.length; i++) {
+				if (streets[i].name == streetName) {	
+					streetIndex = i;
+				}
+			}
+
+			// if street does not exist, make a new one
+			if (streetIndex == -1) {
+				streets.push(new Street(streetName, safety, decorationQuality, review));
+				streets[streets.length].updateValues();
+				showValues(streets.length);
+			}
+			else {
+				streets[streetIndex].safetyValues.push(safety);
+				streets[streetIndex].decorationValues.push(decorationQuality);
+				//streets[streetIndex].candyTypeValues.push(candyTypes);
+				streets[streetIndex].reviews.push(review);
+				streets[streetIndex].updateValues();
+				showValues(streetIndex);
+			}
+
+			console.log(streets);
+		}
+
+		// TODO - change from linear search
+		function search(name) {
+			var found = false;
+			var streetIndex = 0;
+
+			console.log("Initial name: " + name);
+			for (i = 0; i < streets.length; i++) {
+				console.log("Name " + i + " " + streets[i].name);
+				if (name == streets[i].name) {
+					found = true;
+					streetIndex = i;
+				}
+			}
+
+			// if street exists display information
+			if (found) {
+				showValues(streetIndex);
+			}
+			else {
+				document.getElementById("name-location").innerHTML = "Street not found, enter information to rate it";
+				document.getElementById("safety").innerHTML = "";
+				document.getElementById("decoration-quality").innerHTML = "";
+			}
+
+		}
+
+		// update the values onto the screen for the user
+		function showValues(streetIndex) {
+			streets[streetIndex].updateValues();
+			console.log(streets[streetIndex]);
+			document.getElementById("comments").innerHTML = "";
+			document.getElementById("name-location").innerHTML = streets[streetIndex].name;
+			document.getElementById("safety").innerHTML = streets[streetIndex].safety;
+			document.getElementById("decoration-quality").innerHTML = streets[streetIndex].decorationQuality;
+			for (i = 0; i < streets[streetIndex].reviews.length; i++) {
+				var comment = document.createElement("h2");
+				comment.innerHTML = streets[streetIndex].reviews[i];
+				document.getElementById("comments").appendChild(comment);
+			}
+		}
+
+		// initialize some test streets and values
+		function init() {
+			streets.push(new Street("Apple Street", 4, 3, "Had a good time"));
+			streets.push(new Street("Orange Street", 5, 5, "The people give out full-sized candy bars!"))
+			streets.push(new Street("Banana Street", 2, 2, "Supervision is recommended, but it might be best to go somewhere else."));
+		}
+
+		window.onload = init;
+	</script>
 	<div id="main-container" class="whole">
 		<h1 id="title">Track and Treat</h1>
+		<form onsubmit="search(document.getElementById('street-name').value); return false">
+			<p class="field">Enter the name of the street:</p>
+			<label><input type="text" id="street-name" name="street-name" placeholder="Street name here" value="value"></label>
+		</form>
 		<div id="info-container">
-			<h1 id="name-location">/name of location here/</h1>
+			<h1 id="name-location">No street entered</h1>
 			<h1 class="rating-title">Average reported safety:</h1>
-			<h1 class="rating-value">4.8</h1>
+			<h1 class="rating-value" id="safety"></h1>
 			<h1 class="rating-title">Average decorations quality:</h1>
-			<h1 class="rating-value">3.4</h1>
-			<h1 class="rating-title">Typical candy:</h1>
-			<h1 class="rating-value">-Mini candy bars -Other snacks</h1>
-			<h2>Rate this location:</h2>
+			<h1 class="rating-value" id="decoration-quality"></h1>
+			<!-- TODO - rank amount of reported candy types
+ 			<h1 class="rating-title">Typical candy:</h1>
+			<h1 class="rating-value" id="candy-types"></h1>-->
+			<h2 style="margin-top: 15px;">Rate this location:</h2>
 			<form id="rating-form">
 				<p class="field">How safe is this area?</p>
-				<label class="checkbox"><input type="radio" name="safety" required>5</label>
-				<label class="checkbox"><input type="radio" name="safety" required>4</label>
-				<label class="checkbox"><input type="radio" name="safety" required>3</label>
-				<label class="checkbox"><input type="radio" name="safety" required>2</label>
-				<label class="checkbox"><input type="radio" name="safety" required>1</label>
+				<label class="checkbox"><input type="radio" id="sb5" name="safety" required>5</label>
+				<label class="checkbox"><input type="radio" id="sb4" name="safety" required>4</label>
+				<label class="checkbox"><input type="radio" id="sb3" name="safety" required>3</label>
+				<label class="checkbox"><input type="radio" id="sb2" name="safety" required>2</label>
+				<label class="checkbox"><input type="radio" id="sb1" name="safety" required>1</label>
 				<p class="field">How lively were the decorations?</p>
-				<label class="checkbox"><input type="radio" name="decorations" required>5</label>
-				<label class="checkbox"><input type="radio" name="decorations" required>4</label>
-				<label class="checkbox"><input type="radio" name="decorations" required>3</label>
-				<label class="checkbox"><input type="radio" name="decorations" required>2</label>
-				<label class="checkbox"><input type="radio" name="decorations" required>1</label>
-				<p class="field">What kind of candy did you mostly receive?</p>
-				<label class="ckecklist"><input type="checkbox" name="candy" >Full-size candy bars</label>
-				<label class="ckecklist"><input type="checkbox" name="candy">Medium-sized candy bars</label>
-				<label class="checklist"><input type="checkbox" name="candy">Mini candy bars</label>
-				<label class="checklist"><input type="checkbox" name="candy">Off-brand candy</label>
-				<label class="checklist"><input type="checkbox" name="candy">Other snacks</label>
+				<label class="checkbox"><input type="radio" id="db5" name="decorations" required>5</label>
+				<label class="checkbox"><input type="radio" id="db4" name="decorations" required>4</label>
+				<label class="checkbox"><input type="radio" id="db3" name="decorations" required>3</label>
+				<label class="checkbox"><input type="radio" id="db2" name="decorations" required>2</label>
+				<label class="checkbox"><input type="radio" id="db1" name="decorations" required>1</label>
+				<!--<p class="field">What kind of candy did you mostly receive?</p>
+				<label class="ckecklist candy-label"><input type="checkbox" id="cb1" name="candy">Full-sized candy bars</label>
+				<label class="ckecklist candy-label"><input type="checkbox" id="cb2" name="candy">Medium-sized candy bars</label>
+				<label class="checklist candy-label"><input type="checkbox" id="cb3" name="candy">Mini candy bars</label>
+				<label class="checklist candy-label"><input type="checkbox" id="cb4" name="candy">Off-brand candy</label>
+				<label class="checklist candy-label"><input type="checkbox" id="cb5" name="candy">Other snacks</label>-->
 				<p class="field">Any additional comments?</p>
-				<textarea rows="4" colums="40"></textarea>
-				<button type="submit">Submit</button>
+				<textarea id="review" rows="4" colums="40" value="value"></textarea>
+				<button onclick="change();" id="submit" type="button">Submit</button>
 			</form>
+			<h1 class="rating-value" style="margin-top: 15px;">Comments:</h1>
+			<div id="comments">
+			</div>
 		</div>
 	</div>
 </body>
