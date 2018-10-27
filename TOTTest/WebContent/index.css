@@ -1,0 +1,67 @@
+* {
+	margin: 0;
+	padding: 0;
+	font-family: Arial;
+}
+
+html {
+	background-color: #333;
+	height: 100%;
+}
+
+body { 
+	height: 100%; 
+}
+
+.whole::after {
+	height: 0;
+	display: 0;
+	clear: both;
+	content: "";
+}
+
+div#main-container {
+	margin: 0 auto;
+	max-width: 800px;
+	min-width: 500px;
+	background-color: #fff;
+	min-height: 100%;
+}
+
+div#info-container {
+	padding: 15px;
+	margin: 0 auto;
+}
+
+form#rating-form {
+	margin: 30px auto;
+	max-width: 600px;
+	padding: 15px;
+	border-radius: 3px;
+	background: linear-gradient(21deg, #db9, #fdb);
+	box-shadow: 5px 5px 5px rgba(0, 0, 0, .2), -5px 5px 5px rgba(0, 0, 0, .2);
+}
+
+h1#title {
+	padding: 10px;
+	color: #444;
+	background-color: #fa8;
+}
+
+h1.rating-title {
+	font-weight: normal;
+}
+
+p.field {
+	padding: 10px;
+	color: #333;
+	font-weight: bold;
+}
+
+label {
+	padding: 10px;
+}
+
+input {
+	margin-right: 5px;
+}
