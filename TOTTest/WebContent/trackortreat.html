@@ -1,0 +1,185 @@
+<html>
+  <head>
+  <meta name="viewport" content="initial-scale=1.0, 
+      width=device-width" />
+	  <link rel="stylesheet" type="text/css" href="trackortreat.css">
+    <script src="https://js.api.here.com/v3/3.0/mapsjs-core.js" 
+      type="text/javascript" charset="utf-8"></script>
+    <script src="https://js.api.here.com/v3/3.0/mapsjs-service.js" 
+      type="text/javascript" charset="utf-8"></script>
+    <script src="https://js.api.here.com/v3/3.0/mapsjs-ui.js" 
+      type="text/javascript" charset="utf-8"></script>
+    <link rel="stylesheet" type="text/css" 
+      href="https://js.api.here.com/v3/3.0/mapsjs-ui.css" />
+  </head>
+  <body>
+
+  
+  
+  <div id="main-container" class="whole">
+	 <h1 id="title">Track Or Treat</h1>
+	<div id="dah">
+	 <input id="address" type="textbox" value="Monmouth University">
+      <input id="submit" type="button" value="Geocode">
+	  <div style="width:80%; height: 80%;" id="mapContainer"></div>
+	  </div>
+		<form onsubmit="search(document.getElementById('street-name').value); return false">
+			<p class="field">Enter the name of the street:</p>
+			<label><input type="text" id="street-name" name="street-name" placeholder="Street name here" value="123 Example Street"></label>
+		</form>
+		<div id="info-container">
+			<h1 id="name-location">No street entered</h1>
+			<h1 class="rating-title">Average reported safety:</h1>
+			<h1 class="rating-value" id="safety"></h1>
+			<h1 class="rating-title">Average decorations quality:</h1>
+			<h1 class="rating-value" id="decoration-quality"></h1>
+			<!-- TODO - rank amount of reported candy types
+ 			<h1 class="rating-title">Typical candy:</h1>
+			<h1 class="rating-value" id="candy-types"></h1>-->
+			<h2 style="margin-top: 15px;">Rate this location:</h2>
+			<form id="rating-form">
+				<p class="field">How safe is this area?</p>
+				<label class="checkbox"><input type="radio" id="sb5" name="safety" required>5</label>
+				<label class="checkbox"><input type="radio" id="sb4" name="safety" required>4</label>
+				<label class="checkbox"><input type="radio" id="sb3" name="safety" required>3</label>
+				<label class="checkbox"><input type="radio" id="sb2" name="safety" required>2</label>
+				<label class="checkbox"><input type="radio" id="sb1" name="safety" required>1</label>
+				<p class="field">How lively were the decorations?</p>
+				<label class="checkbox"><input type="radio" id="db5" name="decorations" required>5</label>
+				<label class="checkbox"><input type="radio" id="db4" name="decorations" required>4</label>
+				<label class="checkbox"><input type="radio" id="db3" name="decorations" required>3</label>
+				<label class="checkbox"><input type="radio" id="db2" name="decorations" required>2</label>
+				<label class="checkbox"><input type="radio" id="db1" name="decorations" required>1</label>
+				<!--<p class="field">What kind of candy did you mostly receive?</p>
+				<label class="ckecklist candy-label"><input type="checkbox" id="cb1" name="candy">Full-sized candy bars</label>
+				<label class="ckecklist candy-label"><input type="checkbox" id="cb2" name="candy">Medium-sized candy bars</label>
+				<label class="checklist candy-label"><input type="checkbox" id="cb3" name="candy">Mini candy bars</label>
+				<label class="checklist candy-label"><input type="checkbox" id="cb4" name="candy">Off-brand candy</label>
+				<label class="checklist candy-label"><input type="checkbox" id="cb5" name="candy">Other snacks</label>-->
+				<p class="field">Any additional comments?</p>
+				<textarea id="review" rows="4" colums="40" value="value"></textarea>
+				<button onclick="change();" id="submit" type="button">Submit</button>
+			</form>
+			<h1 class="rating-value" style="margin-top: 15px;">Comments:</h1>
+			<div id="comments">
+			</div>
+		</div>
+	</div>
+  
+
+  
+
+  <script>
+  
+
+  vlon= -74.4011338;
+  vlat= 40.365243;
+  
+
+  function HereRun()
+  {
+	  //var divtag = document.getElementById('mapContainer').getElementsByTag("div")
+	  
+
+	  map = new H.Map(
+			    document.getElementById('mapContainer'),
+			    defaultLayers.normal.map,
+			    {
+			    zoom: 10,
+			    center: { lat: vlat, lng: vlon }
+			    });
+  }
+  
+
+  function recenterMap()
+  {
+	  console.log(map);
+	  map.setCenter({lat: vlat, lng: vlon});
+	  map.setZoom(15);
+	  
+
+	  marker = new H.map.Marker({lat: vlat, lng:vlon});
+
+	// Add the marker to the map and center the map at the location of the marker:
+	map.addObject(marker);
+  }
+  
+
+  
+
+  var platform = new H.service.Platform({
+	  'app_id': 'tzZGI6JfskLhH9t9r0I7',
+	  'app_code': 'vb_5ylZiTE51r_xX7D9MwQ'
+	});
+
+  
+
+
+//Retrieve the target element for the map:
+  var targetElement = document.getElementById('mapContainer');
+
+  // Get default map types from the platform object:
+  var defaultLayers = platform.createDefaultLayers();
+
+  // Instantiate the map:
+  var map = new H.Map(
+    document.getElementById('mapContainer'),
+    defaultLayers.normal.map,
+    {
+    zoom: 15,
+    center: { lat: vlat, lng: vlon }
+    });
+
+    </script>
+    
+
+    <script>
+    function blank()
+    {
+    	var geocoder = new google.maps.Geocoder();
+        document.getElementById('submit').addEventListener('click', function() {
+            geocodeAddress(geocoder);
+    });
+    // Create the parameters for the geocoding request:
+    function geocodeAddress(geocoder) {
+        var address = document.getElementById('address').value;
+        geocoder.geocode({'address': address}, function(results, status) {
+          if (status === 'OK') {
+            var position = results[0]
+            console.log(position);
+            vlat = position.geometry.location.lat();
+            vlon= position.geometry.location.lng();
+            console.log(position.geometry.location.lat());
+            console.log(position.geometry.location.lng());
+            
+
+            recenterMap();
+            //HereRun();
+          } else {
+            alert('Geocode was not successful for the following reason: ' + status);
+          }
+        });
+        
+
+        
+
+        }
+    
+
+        
+
+        }
+
+        
+
+      </script>
+       <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCht6GZymzyPvZeKD9TdcbAY_H_4zwQWKA&callback=blank">
+   
+    </script>
+    
+
+    
+
+  </body>
+</html>
